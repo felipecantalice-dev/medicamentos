@@ -2,55 +2,64 @@
 Este projeto buscar selecionar o medicamento mais adequado, com base na maximização da eficácia, analisando todos os sintomas do paciente.
 
 
-## Passo
-
-
-1. Deve perguntar ao cliente todos os sintomas, e realizar uma analise mais profunda através de equipamentos
-2. Pesquisar o medicamento, que maximiza a "cura" dos sintomas
-
-
 ## Banco de dados
 
-medicamento
-+ id
-+ nome
+```mermaid
+erDiagram
+    MEDICAMENTO {
+        INTEGER id PK "not null unique"
+        VARCHAR nome "180"
+    }
 
+    SINTOMA {
+        INTEGER id PK "not null unique"
+        VARCHAR nome "180"
+    }
 
-sintomas
-+ id
-+ nome
+    MEDICAMENTO_EFICACIA_SINTOMA {
+        INTEGER id PK "not null unique"
+        INTEGER idMedicamento FK "not null"
+        INTEGER idSintoma FK "not null"
+        DECIMAL porcentagem "not null"
+    }
 
-medicamento_eficacia_sintoma
-+ id
-+ porcentagem
+    MEDICAMENTO_EFICACIA_SINTOMA }|..|| MEDICAMENTO : "references idMedicamento"
+    MEDICAMENTO_EFICACIA_SINTOMA }|..|| SINTOMA : "references idSintoma"
+
+```
 
 
 ## SQL
 
+#### Criação das tabelas
+
 ```sql
 
-CREATE TABLE medicamento(
-    id long AUTO INCREMENT PRIMARY KEY,
-    nome varchar(180)
+CREATE TABLE IF NOT EXISTS medicamento(
+    id INTEGER NOT NULL UNIQUE,
+    nome VARCHAR(180),
+  	PRIMARY KEY(id)
 );
 
-CREATE TABLE sintoma(
-    id long AUTO INCREMENT PRIMARY KEY,
-    nome varchar(180)
+CREATE TABLE IF NOT EXISTS sintoma(
+    id INTEGER NOT NULL UNIQUE,
+    nome VARCHAR(180),
+  	PRIMARY KEY(id)
 );
 
-CREATE TABLE medicamento_eficacia_sintoma(
-    id long AUTO INCREMENT PRIMARY KEY,
-    idMedicamento long,
-    idSintoma long,
-    porcentagem decimal,
+CREATE TABLE IF NOT EXISTS medicamento_eficacia_sintoma(
+    id INTEGER NOT NULL UNIQUE,
+    idMedicamento INTEGER NOT NULL,
+    idSintoma INTEGER NOT NULL,
+    porcentagem DECIMAL NOT NULL,
+  	PRIMARY KEY(id),
   	FOREIGN KEY (idMedicamento) REFERENCES medicamento(id) ON DELETE CASCADE,
   	FOREIGN KEY (idSintoma) REFERENCES sintoma(id) ON DELETE CASCADE
 );
 
 ```
 
-Dados de teste
+#### Inserção dos dados de teste
 
 ```sql
 -- Tabela medicamento
@@ -72,14 +81,34 @@ INSERT INTO medicamento_eficacia_sintoma (id, idMedicamento, idSintoma, porcenta
 
 ```
 
-Busca pelos medicamentos que tratam o sintoma
+#### Funcionalidades
 
 ```sql
+-- Lista todos os medicamentos
+SELECT id, nome FROM medicamento;
+```
 
+```sql
+-- Lista todos os sintomas
 SELECT id, nome FROM sintoma;
+```
 
--- IN(1, 2)
-SELECT id, idMedicamento, idSintoma, porcentagem
-    FROM medicamento_eficacia_sintoma
-    WHERE idSintoma IN :idSintoma;
+```sql
+-- Lista todos os medicamentos, que tratam O sintoma, ordenando pela porcentagem de eficiencia
+SELECT ms.id, ms.idMedicamento, ms.idsintoma, m.nome, s.nome, ms.porcentagem
+	from medicamento_eficacia_sintoma ms
+    LEFT JOIN sintoma s ON s.id == ms.idSintoma
+    LEFT JOIN medicamento m ON m.id == ms.idMedicamento
+    WHERE ms.idSintoma = 1
+    ORDER BY ms.porcentagem DESC;
+```
+
+```sql
+-- Lista todos os medicamentos, que tratam OS sintomas, ordenando pela porcentagem de eficiencia
+SELECT ms.id, m.nome, s.nome as sintoma, ms.porcentagem, ms.idMedicamento, ms.idsintoma
+	from medicamento_eficacia_sintoma ms
+    LEFT JOIN sintoma s ON s.id == ms.idSintoma
+    LEFT JOIN medicamento m ON m.id == ms.idMedicamento
+    WHERE ms.idSintoma in (1, 2) --idSintoma
+    ORDER BY sintoma ASC, ms.porcentagem DESC;
 ```
