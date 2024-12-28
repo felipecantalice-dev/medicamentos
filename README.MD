@@ -1,6 +1,13 @@
-# Medicamentos
+# Medicamento mais eficiente
 Este projeto buscar selecionar o medicamento mais adequado, com base na maximização da eficácia, analisando todos os sintomas do paciente.
 
+## Problema
+Tendo m medicamentos e n sintomas, qual medicamento que devo tomar para maximizar o tratamento, e minimizar os sintomas.
+
+Cada remédio contem um principio ativo, que alivia determinado sintoma, e para este sintoma ele possui uma porcentagem de tratamento associada.
+
+Um paciente lista diversos sintomas, e o algoritmo calcula qual o remédio mais adequado que minimize os sintomas, e maximize sua saúde.
+![](/image.png)
 
 ## Banco de dados
 
